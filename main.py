@@ -1,6 +1,7 @@
 import requests
 import csv
 import time
+
 def get_data(offset, kode_ref_pend, pengadaan_kd):
     # https://api-sscasn.bkn.go.id/2024/portal/spf?kode_ref_pend=5191063&pengadaan_kd=2&offset=0
 
@@ -28,7 +29,7 @@ def get_data(offset, kode_ref_pend, pengadaan_kd):
     #             "gaji_min": "5500000",
     #             "gaji_max": "7800000"
     #         },
-    #     GET /2024/portal/spf?kode_ref_pend=5191063&pengadaan_kd=2&offset=0 HTTP/1.1
+    # GET /2024/portal/spf?kode_ref_pend=5191063&pengadaan_kd=2&offset=0 HTTP/1.1
     # Accept: application/json, text/plain, */*
     # Accept-Encoding: gzip, deflate, br, zstd
     # Accept-Language: en-US,en;q=0.9,id-ID;q=0.8,id;q=0.7
@@ -72,13 +73,17 @@ def get_data(offset, kode_ref_pend, pengadaan_kd):
 
 if __name__ == '__main__':
     timestamp = time.time()
+    # Change this to get different data
+    # See https://sscasn.bkn.go.id/ by inspecting the network tab
+    kode_pendidikan = '5191063'
+    kode_pengadaan = '2'
+    
     with open(f'data-{timestamp}.csv', mode='w') as file:
         writer = csv.writer(file)
         writer.writerow(['Nama Instansi', 'Formasi', 'Jabatan', 'Unit Kerja', 'Jumlah Kebutuhan', 'Gaji Min', 'Gaji Max', "Link"])
         pass
-    for i in range(0, 2420, 10):
-        kode_pendidikan = '5191063'
-        kode_pengadaan = '2'
+    total_data = get_data(0, kode_pendidikan, kode_pengadaan)['data']['meta']['total']
+    for i in range(0, int(total_data), 10):
         data = get_data(i, kode_pendidikan, kode_pengadaan)
         with open(f'data-{timestamp}.csv', mode='a') as file:
             writer = csv.writer(file)
